@@ -8,6 +8,8 @@ Platform::Platform(sf::Color color, sf::Vector2f size, sf::Vector2f position)
 	m_body.setPosition(position);
 }
 
+
+//drawing the platform
 void Platform::draw(sf::RenderWindow& window)
 {
 	window.draw(m_body);
@@ -23,7 +25,6 @@ void Platform::update()
 		m_body.move(0.0f, 0.1f);
 	}
 }
-
 
 //collision screen
 void Platform::handleCollision(sf::View& view)

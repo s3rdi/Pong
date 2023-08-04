@@ -13,7 +13,7 @@ void resizeView(const sf::RenderWindow& window, sf::View& view) {
 
 int main()
 {
-    //creating window
+    //creating window and view
     sf::RenderWindow window(sf::VideoMode(1024, 1024), "Pong", sf::Style::Default);
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(1024.0f, g_viewHeight));
 
@@ -21,14 +21,12 @@ int main()
     Platform userBar(sf::Color::White, sf::Vector2f(20.0f, 200.0f), sf::Vector2f(-400.0f, 0.0f));
     Platform enemyBar(sf::Color::White, sf::Vector2f(20.0f, 200.0f), sf::Vector2f(400.0f, 0.0f));
     Ball ball(sf::Color::White, 10.0f, sf::Vector2f(0.0f, 0.0f));
-
-    //runtime clock for the ball
-    float deltaTime{ 0.0f };
-    sf::Clock clock{};
+    int userLives{ 3 };
+    int enemyLives{ 3 };
+    bool waitForInput{ false };
 
     //game running
     while (window.isOpen()) {
-        deltaTime = clock.restart().asSeconds();
         sf::Event evnt;
 
         //handling user calls
@@ -43,9 +41,16 @@ int main()
         }
 
         //handling ball movement
+        while (waitForInput) {
+            //move to start
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
+                sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+                waitForInput = false;
+            }
+        }
         ball.collidingBar(userBar, enemyBar);
-        ball.screenCollision(view);
-        ball.update(deltaTime);
+        ball.screenCollision(view, userLives, enemyLives, waitForInput);
+        ball.update();
 
         //handling user input
         userBar.update();
@@ -59,7 +64,6 @@ int main()
         ball.draw(window);
         window.display();
     }
-
 
     return 0;
 }

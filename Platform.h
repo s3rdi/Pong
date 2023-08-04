@@ -11,6 +11,7 @@ public:
 
 	void draw(sf::RenderWindow& window);
 	void update();
+	void moveAI();
 	void handleCollision(sf::View& view);
 	auto getBounaries() { return m_body.getGlobalBounds(); };
 
