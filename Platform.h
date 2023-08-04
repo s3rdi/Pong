@@ -12,6 +12,7 @@ public:
 	void draw(sf::RenderWindow& window);
 	void update();
 	void handleCollision(sf::View& view);
+	auto getBounaries() { return m_body.getGlobalBounds(); };
 
 private:
 	sf::RectangleShape m_body;

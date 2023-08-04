@@ -1,6 +1,6 @@
 ﻿#include <SFML/Graphics.hpp>
 #include "Platform.h"
-
+#include "Ball.h"
 
 //viewHeight to scale UI
 static constexpr float g_viewHeight{ 1024.0f };
@@ -20,14 +20,18 @@ int main()
     //creating objects
     Platform userBar(sf::Color::White, sf::Vector2f(20.0f, 200.0f), sf::Vector2f(-400.0f, 0.0f));
     Platform enemyBar(sf::Color::White, sf::Vector2f(20.0f, 200.0f), sf::Vector2f(400.0f, 0.0f));
-    sf::CircleShape ball(10.0f);
-    ball.setFillColor(sf::Color::White);
+    Ball ball(sf::Color::White, 10.0f, sf::Vector2f(0.0f, 0.0f));
+
+    //runtime clock for the ball
+    float deltaTime{ 0.0f };
+    sf::Clock clock{};
 
     //game running
     while (window.isOpen()) {
+        deltaTime = clock.restart().asSeconds();
         sf::Event evnt;
 
-        //handling user input
+        //handling user calls
         while (window.pollEvent(evnt)) {
             switch (evnt.type) {
             case sf::Event::Closed:
@@ -37,6 +41,13 @@ int main()
                 resizeView(window, view);
             }
         }
+
+        //handling ball movement
+        ball.collidingBar(userBar, enemyBar);
+        ball.screenCollision(view);
+        ball.update(deltaTime);
+
+        //handling user input
         userBar.update();
         userBar.handleCollision(view);
 
@@ -45,7 +56,7 @@ int main()
         window.setView(view);
         userBar.draw(window);
         enemyBar.draw(window);
-        window.draw(ball);
+        ball.draw(window);
         window.display();
     }
 
