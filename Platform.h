@@ -10,9 +10,12 @@ public:
 	~Platform() = default;
 
 	void draw(sf::RenderWindow& window);
+	void update();
+	void handleCollision(sf::View& view);
 
 private:
 	sf::RectangleShape m_body;
+
 };
 
 #endif

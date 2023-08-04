@@ -37,6 +37,8 @@ int main()
                 resizeView(window, view);
             }
         }
+        userBar.update();
+        userBar.handleCollision(view);
 
         //handling the window output
         window.clear(sf::Color::Black);
