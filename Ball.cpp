@@ -25,14 +25,11 @@ void Ball::update(float deltaTime)
 //collision screen
 void Ball::screenCollision(sf::View& view)
 {
-	if ((m_body.getPosition().y - m_body.getRadius()) < -view.getSize().y / 2.0f) {
-		m_speed.y *= -1;
-	}
-	else if ((m_body.getPosition().y + m_body.getRadius()) > view.getSize().y / 2.0f) {
+	if ((m_body.getPosition().y - m_body.getRadius()) < -view.getSize().y / 2.0f || 
+		(m_body.getPosition().y + m_body.getRadius()) > view.getSize().y / 2.0f) {
 		m_speed.y *= -1;
 	}
 }
-
 
 //collision bar
 void Ball::collidingBar(Platform& userBar, Platform& enemyBar) {
@@ -40,10 +37,7 @@ void Ball::collidingBar(Platform& userBar, Platform& enemyBar) {
 	sf::Vector2f uPC {m_body.getPosition().x - m_body.getRadius(), m_body.getPosition().y};
 	//pixel of the ball coliding with enemy bar
 	sf::Vector2f ePC {m_body.getPosition().x + m_body.getRadius(), m_body.getPosition().y};
-	if (userBar.getBounaries().contains(uPC)) {
-		m_speed.x *= -1;
-	}
-	else if (enemyBar.getBounaries().contains(ePC)) {
+	if (userBar.getBounaries().contains(uPC) || enemyBar.getBounaries().contains(ePC)) {
 		m_speed.x *= -1;
 	}
 }
