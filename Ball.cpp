@@ -24,31 +24,33 @@ void Ball::update()
 	m_body.setPosition(m_velocity.x, m_velocity.y);
 }
 
+//resetting the ball after scoring
+void Ball::reset()
+{
+	m_velocity.x = Config::startPositionX;
+	m_velocity.y = Config::startPositionY;
+	m_speed.x = Config::startSpeedX;
+	m_speed.x = Config::startSpeedY;
+}
+
 //collision screen
 void Ball::screenCollision(sf::View& view, int& userLives, int& enemyLives, bool& waitForInput)
 {
 	if ((m_body.getPosition().y - m_body.getRadius()) < -view.getSize().y / 2.0f || 
 		(m_body.getPosition().y + m_body.getRadius()) > view.getSize().y / 2.0f) {
-		m_speed.y *= -1;
+		//inverting y-axis
+		m_speed.y *= -1.0f;
 	}
 
 	if ((m_body.getPosition().x - m_body.getRadius()) < -view.getSize().x / 2.0f) {
-		//resetting the ball
-		m_velocity.x = 0.0f;
-		m_velocity.y = 0.0f;
-		m_speed.x = -0.1f;
-		m_speed.x = 0.05f;
 		//losing a point
+		reset();
 		--userLives;
 		waitForInput = true;
 	}
 	else if ((m_body.getPosition().x + m_body.getRadius()) > view.getSize().x / 2.0f) {
-		//resetting the ball
-		m_velocity.x = 0.0f;
-		m_velocity.y = 0.0f;
-		m_speed.x = -0.1f;
-		m_speed.x = 0.05f;
 		//scoring a point
+		reset();
 		--enemyLives;
 		waitForInput = true;
 	}
@@ -60,6 +62,6 @@ void Ball::collidingBar(Platform& userBar, Platform& enemyBar) {
 	//pixel of the ball colliding with enemy bar
 	if (userBar.getBounaries().contains(m_body.getPosition().x - m_body.getRadius(), m_body.getPosition().y) ||
 		enemyBar.getBounaries().contains(m_body.getPosition().x + m_body.getRadius(), m_body.getPosition().y)) {
-		m_speed.x *= -1;
+		m_speed.x *= -Config::bouncingAngle;
 	}
 }
