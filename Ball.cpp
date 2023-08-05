@@ -27,29 +27,32 @@ void Ball::update()
 //resetting the ball after scoring
 void Ball::reset()
 {
-	m_velocity.x = Config::startPositionX;
-	m_velocity.y = Config::startPositionY;
-	m_speed.x = Config::startSpeedX;
-	m_speed.x = Config::startSpeedY;
+	m_velocity.x = ConfigB::startPositionX;
+	m_velocity.y = ConfigB::startPositionY;
+	m_speed.x = ConfigB::startSpeedX;
+	m_speed.x = ConfigB::startSpeedY;
 }
 
 //collision screen
-void Ball::screenCollision(sf::View& view, int& userLives, int& enemyLives, bool& waitForInput)
+void Ball::screenCollision(sf::View& view, int& userLives, int& enemyLives, bool& waitForInput, sf::Sound& winSound, sf::Sound& loseSound, sf::Sound& sound)
 {
 	if ((m_body.getPosition().y - m_body.getRadius()) < -view.getSize().y / 2.0f || 
 		(m_body.getPosition().y + m_body.getRadius()) > view.getSize().y / 2.0f) {
-		//inverting y-axis
+		//inverting y-axis speed
+		sound.play();
 		m_speed.y *= -1.0f;
 	}
 
 	if ((m_body.getPosition().x - m_body.getRadius()) < -view.getSize().x / 2.0f) {
 		//losing a point
+		loseSound.play();
 		reset();
 		--userLives;
 		waitForInput = true;
 	}
 	else if ((m_body.getPosition().x + m_body.getRadius()) > view.getSize().x / 2.0f) {
 		//scoring a point
+		winSound.play();
 		reset();
 		--enemyLives;
 		waitForInput = true;
@@ -57,11 +60,12 @@ void Ball::screenCollision(sf::View& view, int& userLives, int& enemyLives, bool
 }
 
 //collision bar
-void Ball::collidingBar(Platform& userBar, Platform& enemyBar) {
+void Ball::collidingBar(Platform& userBar, Platform& enemyBar, sf::Sound& sound) {
 	//pixel of the ball colliding with user bar ||
 	//pixel of the ball colliding with enemy bar
 	if (userBar.getBounaries().contains(m_body.getPosition().x - m_body.getRadius(), m_body.getPosition().y) ||
 		enemyBar.getBounaries().contains(m_body.getPosition().x + m_body.getRadius(), m_body.getPosition().y)) {
-		m_speed.x *= -Config::bouncingAngle;
+		sound.play();
+		m_speed.x *= -ConfigB::bouncingAngle;
 	}
 }

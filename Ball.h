@@ -1,9 +1,10 @@
 #ifndef BALL_H
 #define BALL_H
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "Platform.h"
 
-namespace Config {
+namespace ConfigB {
 	//ball starting position
 	static constexpr float startPositionX{ 0.0f };
 	static constexpr float startPositionY{ 0.0f };
@@ -26,14 +27,14 @@ public:
 
 	void draw(sf::RenderWindow& window);
 	void update();
-	void screenCollision(sf::View& view, int& userLives, int& enemyLives, bool& waitForInput);
-	void collidingBar(Platform& userBar, Platform& enemyBar);
+	void screenCollision(sf::View& view, int& userLives, int& enemyLives, bool& waitForInput, sf::Sound& winSound, sf::Sound& loseSound, sf::Sound& sound);
+	void collidingBar(Platform& userBar, Platform& enemyBar, sf::Sound& sound);
 	void reset();
 	sf::Vector2f getBallPosition() { return m_body.getPosition(); };
 
 private:
-	sf::CircleShape m_body;
-	sf::Vector2f m_velocity{ Config::startPositionX, Config::startPositionY };
-	sf::Vector2f m_speed{ Config::startSpeedX, Config::startSpeedX };
+	sf::CircleShape m_body{};
+	sf::Vector2f m_velocity{ ConfigB::startPositionX, ConfigB::startPositionY };
+	sf::Vector2f m_speed{ ConfigB::startSpeedX, ConfigB::startSpeedX };
 };
 #endif

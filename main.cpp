@@ -2,6 +2,7 @@
 #include <string>
 #include <string_view>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "Platform.h"
 #include "Ball.h"
 
@@ -30,7 +31,6 @@ namespace Config {
     //game color
     static const sf::Color propsColor{ sf::Color::White };
     static const sf::Color bgColor{ sf::Color::Black };
-
 }
 
 //scaling the game to user resized UI
@@ -41,12 +41,12 @@ void resizeView(const sf::RenderWindow& window, sf::View& view) {
 
 int main()
 {
-    //creating window view and font
+    //creating window and view
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(Config::viewWidth), static_cast<unsigned int>(Config::viewHeight)), "Pong", sf::Style::Default);
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(Config::viewWidth, Config::viewHeight));
-    sf::Font font{};
 
     //handling font loading
+    sf::Font font{};
     if (!font.loadFromFile("./fonts/PublicPixel-z84yD.ttf")) {
         std::cout << "Failed to load the font!\n";
         return EXIT_FAILURE;
@@ -58,7 +58,12 @@ int main()
     Ball ball(Config::propsColor, Config::ballRadius, sf::Vector2f(ConfigB::startPositionX, ConfigB::startPositionY));
     int userLives{ Config::maxLives };
     int enemyLives{ Config::maxLives };
-    bool waitForInput{ false };
+
+    //is game not displayed yet
+    bool gameCreation{ true };
+
+    //did the round/game reset
+    bool waitForInput{ true };
 
     //creating text
     sf::Text t_userLives{std::to_string(Config::maxLives), font, Config::textSize};
@@ -73,13 +78,62 @@ int main()
     sf::Text t_gameResult{"", font, Config::textSize};
     t_gameResult.setFillColor(Config::propsColor);
 
-    //smaller font by 20
+    //creating sounds
+
+    //game won sound
+    sf::SoundBuffer s_soundBufferWinGame{};
+    if (!s_soundBufferWinGame.loadFromFile("./sounds/won_game.wav")) {
+        std::cout << "Failed to load the winning sound!\n";
+        return EXIT_FAILURE;
+    }
+    sf::Sound s_winGame{};
+    s_winGame.setBuffer(s_soundBufferWinGame);
+
+    //game lost sound
+    sf::SoundBuffer s_soundBufferLoseGame{};
+    if (!s_soundBufferLoseGame.loadFromFile("./sounds/lost_game.wav")) {
+        std::cout << "Failed to load the losing sound!\n";
+        return EXIT_FAILURE;
+    }
+    sf::Sound s_loseGame{};
+    s_loseGame.setBuffer(s_soundBufferLoseGame);
+
+    //ball hit sound
+    sf::SoundBuffer s_soundBufferBallHit{};
+    if (!s_soundBufferBallHit.loadFromFile("./sounds/ball_hit.wav")) {
+        std::cout << "Failed to load the hitting sound!\n";
+        return EXIT_FAILURE;
+    }
+    sf::Sound s_ballHit{};
+    s_ballHit.setBuffer(s_soundBufferBallHit);
+
+    //score sound
+    sf::SoundBuffer s_soundBufferScore{};
+    if (!s_soundBufferScore.loadFromFile("./sounds/won_point.wav")) {
+        std::cout << "Failed to load the scoring a point sound!\n";
+        return EXIT_FAILURE;
+    }
+    sf::Sound s_scoredPoint{};
+    s_scoredPoint.setBuffer(s_soundBufferScore);
+
+    //point lost sound
+    sf::SoundBuffer s_soundBufferAIScore{};
+    if (!s_soundBufferAIScore.loadFromFile("./sounds/lost_point.wav")) {
+        std::cout << "Failed to load the losing a point sound!\n";
+        return EXIT_FAILURE;
+    }
+    sf::Sound s_lostPoint{};
+    s_lostPoint.setBuffer(s_soundBufferAIScore);
+
+
+
+    //smaller font (-20)
     sf::Text playAgain{ "Move to continue!\n", font, Config::textSize-20};
     playAgain.setFillColor(Config::propsColor);
     //set lower (200.0f) for better look
     playAgain.setPosition(-playAgain.getGlobalBounds().getSize().x / 2.0f, 200.0f);
 
-    //smaller font by 20
+    //smaller font (-20)
     sf::Text t_escToQuit{ "Esc to quit!\n", font, Config::textSize - 20};
     t_escToQuit.setFillColor(Config::propsColor);
     //set lower (250.0f) for better look
@@ -100,9 +154,8 @@ int main()
             }
         }
 
-
         //handling ball movement
-        while (waitForInput) {
+        while (waitForInput && !gameCreation) {
             //move to start
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
                 sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
@@ -115,8 +168,8 @@ int main()
                 waitForInput = false;
             }
         }
-        ball.collidingBar(userBar, enemyBar);
-        ball.screenCollision(view, userLives, enemyLives, waitForInput);
+        ball.collidingBar(userBar, enemyBar, s_ballHit);
+        ball.screenCollision(view, userLives, enemyLives, waitForInput, s_scoredPoint, s_lostPoint, s_ballHit);
         ball.update();
 
         //handling points
@@ -151,14 +204,24 @@ int main()
         window.draw(t_gameResult);
         userBar.draw(window);
         enemyBar.draw(window);
+
+        //win-lose, play again conditions
         if (waitForInput) {
             window.draw(playAgain);
-            if (userLives == 0 || enemyLives == 0)
+            if (userLives == 0) {
+                s_loseGame.play();
                 window.draw(t_escToQuit);
+            }
+            else if (enemyLives == 0) {
+                s_winGame.play();
+                window.draw(t_escToQuit);
+            }
         }
         ball.draw(window);
         window.display();
-    }
 
+        //waiting 1 iteration for first display
+        gameCreation = false;
+    }
     return 0;
 }
