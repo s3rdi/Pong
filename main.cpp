@@ -2,27 +2,42 @@
 #include "Platform.h"
 #include "Ball.h"
 
-//viewHeight to scale UI
-static constexpr float g_viewHeight{ 1024.0f };
+namespace Config {
+    //height of user's view
+    static constexpr float g_viewHeight{ 1024.0f };
+
+    //max lives for both players
+    static constexpr int maxLives{ 3 };
+
+    //ball config
+    static constexpr float ballRadius{ 10.0f };
+
+    //bar config
+    static const sf::Vector2f barSize{ 20.0f, 200.0f };
+    static constexpr float barPosition{ 400.0f };
+
+    //game color
+    static const sf::Color gameColor{ sf::Color::White };
+}
 
 //scaling the game to user resized UI
 void resizeView(const sf::RenderWindow& window, sf::View& view) {
     float aspectRatio{ static_cast<float>(window.getSize().x) / static_cast<float>(window.getSize().y) };
-    view.setSize(sf::Vector2f(g_viewHeight * aspectRatio, g_viewHeight));
+    view.setSize(sf::Vector2f(Config::g_viewHeight * aspectRatio, Config::g_viewHeight));
 }
 
 int main()
 {
     //creating window and view
     sf::RenderWindow window(sf::VideoMode(1024, 1024), "Pong", sf::Style::Default);
-    sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(1024.0f, g_viewHeight));
+    sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(1024.0f, Config::g_viewHeight));
 
     //creating objects
-    Platform userBar(sf::Color::White, sf::Vector2f(20.0f, 200.0f), sf::Vector2f(-400.0f, 0.0f));
-    Platform enemyBar(sf::Color::White, sf::Vector2f(20.0f, 200.0f), sf::Vector2f(400.0f, 0.0f));
-    Ball ball(sf::Color::White, 10.0f, sf::Vector2f(0.0f, 0.0f));
-    int userLives{ 3 };
-    int enemyLives{ 3 };
+    Platform userBar(Config::gameColor, Config::barSize, sf::Vector2f(-Config::barPosition, 0.0f));
+    Platform enemyBar(Config::gameColor, Config::barSize, sf::Vector2f(Config::barPosition, 0.0f));
+    Ball ball(Config::gameColor, Config::ballRadius, sf::Vector2f(ConfigB::startPositionX, ConfigB::startPositionY));
+    int userLives{ Config::maxLives };
+    int enemyLives{ Config::maxLives };
     bool waitForInput{ false };
 
     //game running
