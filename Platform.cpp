@@ -19,22 +19,22 @@ void Platform::draw(sf::RenderWindow& window)
 void Platform::update()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		m_body.move(0.0f, -0.1f);
+		m_body.move(0.0f, -ConfigP::moveSpeed);
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-		m_body.move(0.0f, 0.1f);
+		m_body.move(0.0f, ConfigP::moveSpeed);
 	}
 }
 
 //handling AI
 void Platform::moveAI(Ball& ball, Platform& enemyBar)
 {
-	if (abs(m_body.getPosition().x - ball.getBallPosition().x) < 400.0f) {
+	if (abs(m_body.getPosition().x - ball.getBallPosition().x) < ConfigP::AIresponse) {
 		if (m_body.getPosition().y < ball.getBallPosition().y) {
-			m_body.move(0.0f, 0.1f);
+			m_body.move(0.0f, ConfigP::moveSpeed);
 		}
 		else if (m_body.getPosition().y > ball.getBallPosition().y) {
-			m_body.move(0.0f, -0.1f);
+			m_body.move(0.0f, -ConfigP::moveSpeed);
 		}
 	}
 }

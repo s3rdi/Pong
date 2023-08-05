@@ -3,6 +3,14 @@
 #include <SFML/Graphics.hpp>
 #include "Ball.h"
 
+namespace ConfigP {
+	//speed of bars
+	static constexpr float moveSpeed{ 0.1f };
+
+	//x-axis distance of AI's bar responding to the ball
+	static constexpr float AIresponse{ 500.0f };
+}
+
 class Ball;
 
 //platform maker
