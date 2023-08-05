@@ -26,6 +26,19 @@ void Platform::update()
 	}
 }
 
+//handling AI
+void Platform::moveAI(Ball& ball, Platform& enemyBar)
+{
+	if (abs(m_body.getPosition().x - ball.getBallPosition().x) < 400.0f) {
+		if (m_body.getPosition().y < ball.getBallPosition().y) {
+			m_body.move(0.0f, 0.1f);
+		}
+		else if (m_body.getPosition().y > ball.getBallPosition().y) {
+			m_body.move(0.0f, -0.1f);
+		}
+	}
+}
+
 //collision screen
 void Platform::handleCollision(sf::View& view)
 {

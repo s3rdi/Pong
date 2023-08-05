@@ -37,7 +37,7 @@ void Ball::screenCollision(sf::View& view, int& userLives, int& enemyLives, bool
 		m_velocity.x = 0.0f;
 		m_velocity.y = 0.0f;
 		m_speed.x = -0.1f;
-		m_speed.x = 0.04f;
+		m_speed.x = 0.05f;
 		//losing a point
 		--userLives;
 		waitForInput = true;
@@ -47,7 +47,7 @@ void Ball::screenCollision(sf::View& view, int& userLives, int& enemyLives, bool
 		m_velocity.x = 0.0f;
 		m_velocity.y = 0.0f;
 		m_speed.x = -0.1f;
-		m_speed.x = 0.04f;
+		m_speed.x = 0.05f;
 		//scoring a point
 		--enemyLives;
 		waitForInput = true;

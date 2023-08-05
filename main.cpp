@@ -52,6 +52,10 @@ int main()
         ball.screenCollision(view, userLives, enemyLives, waitForInput);
         ball.update();
 
+        //handling AI movement
+        enemyBar.moveAI(ball, enemyBar);
+        enemyBar.handleCollision(view);
+
         //handling user input
         userBar.update();
         userBar.handleCollision(view);
