@@ -10,7 +10,7 @@ namespace ConfigB {
 	static constexpr float startPositionY{ 0.0f };
 
 	//ball starting speed
-	static constexpr float startSpeedX{ -0.1f };
+	static constexpr float startSpeedX{ 0.1f };
 	static constexpr float startSpeedY{ 0.05f };
 
 	//angle of bouncing ball

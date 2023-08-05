@@ -24,10 +24,11 @@ public:
 	void update();
 	void moveAI(Ball& ball, Platform& enemyBar);
 	void handleCollision(sf::View& view);
+	void reset(float positionX, float positionY);
 	auto getBounaries() { return m_body.getGlobalBounds(); };
 
 private:
-	sf::RectangleShape m_body;
+	sf::RectangleShape m_body{};
 
 };
 

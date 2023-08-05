@@ -50,3 +50,8 @@ void Platform::handleCollision(sf::View& view)
 		m_body.setPosition(m_body.getPosition().x, view.getSize().y / 2.0f - halfPlatform);
 	}
 }
+
+void Platform::reset(float positionX, float positionY)
+{
+	m_body.setPosition(positionX, positionY);
+}
