@@ -58,12 +58,6 @@ int main()
     int userLives{ Config::maxLives };
     int enemyLives{ Config::maxLives };
 
-    //is game not displayed yet
-    bool gameCreation{ true };
-
-    //did the round/game reset
-    bool waitForInput{ true };
-
     //creating text
     sf::Text t_userLives{std::to_string(Config::maxLives), font, Config::textSize};
     t_userLives.setFillColor(gConfig::propsColor);
@@ -142,6 +136,9 @@ int main()
     bool isPlaying{ false };
     bool isNewGame{ false };
 
+    //did the round/game reset
+    bool waitForInput{ true };
+
     //game running
     while (window.isOpen()) {
         sf::Event evnt{};
@@ -163,15 +160,20 @@ int main()
                 case sf::Keyboard::Up:
                 case sf::Keyboard::W:
                     menu.moveUp();
+                    if (waitForInput)
+                        s_ballHit.play();
                     break;
                 case sf::Keyboard::Down:
                 case sf::Keyboard::S:
+                    if (waitForInput)
+                        s_ballHit.play();
                     menu.moveDown();
                     break;
                 case sf::Keyboard::Return:
                 case sf::Keyboard::Space:
                     switch (menu.getSelectedIndex()) {
                     case 0:
+                        s_scoredPoint.play();
                         isNewGame = true;
                         isPlaying = true;
                         break;
@@ -189,7 +191,7 @@ int main()
         }
 
         if (isPlaying) {
-            if (waitForInput && !gameCreation) {
+            if (waitForInput) {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
                     sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || isNewGame) {
                     //handling instant new game
@@ -243,9 +245,6 @@ int main()
                 userBar.draw(window);
                 enemyBar.draw(window);
                 ball.draw(window);
-
-                //waiting 1 iteration for first display
-                gameCreation = false;
 
                 //win-lose and play again conditions
                 if (waitForInput) {
