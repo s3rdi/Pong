@@ -4,8 +4,11 @@
 #include <SFML/Graphics.hpp>
 #include "Config.h"
 
-namespace ConfigM {
+namespace mConfig {
+	//number of items in menu
 	static constexpr int maxMenuItems{ 3 };
+
+	//color of the selected item
 	static const sf::Color selectedColor{sf::Color(100, 100, 100)};
 }
 
@@ -21,8 +24,7 @@ public:
 	int getSelectedIndex() { return m_selectedItem; };
 
 private:
-	std::array<sf::Text, ConfigM::maxMenuItems> m_menu{};
+	std::array<sf::Text, mConfig::maxMenuItems> m_menu{};
 	int m_selectedItem{};
 };
-
 #endif

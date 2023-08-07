@@ -18,12 +18,12 @@ namespace Config {
 
     //ball config
     //ball radius
-    static constexpr float ballRadius{ 10.0f };
+    static constexpr float ballRadius{ 8.0f };
 
     //bar config
     //bar size and starting position
-    static const sf::Vector2f barSize{ 20.0f, 200.0f };
-    static constexpr float barPosition{ 450.0f };
+    static const sf::Vector2f barSize{ 10.0f, 100.0f };
+    static constexpr float barPosition{ 600.0f };
 
     //text config
     //text size, score position, win and lose frazes
@@ -63,9 +63,9 @@ int main()
     //creating objects for the game
     Menu menu(Config::viewWidth, Config::viewHeight, font);
     //bars on the opposite sides of the window
-    Platform userBar(gConfig::propsColor, Config::barSize, sf::Vector2f(-Config::barPosition, 0.0f));
-    Platform enemyBar(gConfig::propsColor, Config::barSize, sf::Vector2f(Config::barPosition, 0.0f));
-    Ball ball(gConfig::propsColor, Config::ballRadius);
+    Platform userBar(Config::barSize, sf::Vector2f(-Config::barPosition, 0.0f));
+    Platform enemyBar(Config::barSize, sf::Vector2f(Config::barPosition, 0.0f));
+    Ball ball(Config::ballRadius);
     int userLives{ Config::maxLives };
     int enemyLives{ Config::maxLives };
 
@@ -242,15 +242,19 @@ int main()
                 if (ball.collidingBar(userBar, enemyBar)) {
                     s_ballHit.play();
                 }
-                switch (ball.screenCollision(view, userLives, enemyLives, waitForInput)) {
+                switch (ball.screenCollision(view)) {
                 case 2:
                     s_ballHit.play();
                     break;
                 case -1:
                     s_lostPoint.play();
+                    --userLives;
+                    waitForInput = true;
                     break;
                 case 1:
                     s_scoredPoint.play();
+                    --enemyLives;
+                    waitForInput = true;
                     break;
                 case 0:
                     break;
