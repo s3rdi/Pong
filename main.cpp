@@ -43,6 +43,14 @@ int main()
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(Config::viewWidth), static_cast<unsigned int>(Config::viewHeight)), "Pong", sf::Style::Default);
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(Config::viewWidth, Config::viewHeight));
 
+    //handling icon loading
+    sf::Image icon{};
+    if (!icon.loadFromFile("./icon.png")) {
+        std::cout << "Failed to load the icon!\n";
+        return EXIT_FAILURE;
+    }
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
     //handling font loading
     sf::Font font{};
     if (!font.loadFromFile("./fonts/PublicPixel-z84yD.ttf")) {
@@ -53,7 +61,7 @@ int main()
     //creating objects
     Platform userBar(gConfig::propsColor, Config::barSize, sf::Vector2f(-Config::barPosition, 0.0f));
     Platform enemyBar(gConfig::propsColor, Config::barSize, sf::Vector2f(Config::barPosition, 0.0f));
-    Ball ball(gConfig::propsColor, Config::ballRadius, sf::Vector2f(ConfigB::startPositionX, ConfigB::startPositionY));
+    Ball ball(gConfig::propsColor, Config::ballRadius);
     Menu menu(Config::viewWidth, Config::viewHeight, font);
     int userLives{ Config::maxLives };
     int enemyLives{ Config::maxLives };
@@ -139,8 +147,13 @@ int main()
     //did the round/game reset
     bool waitForInput{ true };
 
+    //clock for dt
+    sf::Clock deltaClock{};
+    float dt{};
+
     //game running
     while (window.isOpen()) {
+        dt = deltaClock.restart().asSeconds();
         sf::Event evnt{};
 
         //handling all events
@@ -210,7 +223,7 @@ int main()
                 //handling ball movement
                 ball.collidingBar(userBar, enemyBar, s_ballHit);
                 ball.screenCollision(view, userLives, enemyLives, waitForInput, s_scoredPoint, s_lostPoint, s_ballHit);
-                ball.update();
+                ball.update(dt);
 
                 //handling points
                 t_userLives.setString(std::to_string(userLives));
@@ -229,11 +242,11 @@ int main()
                 }
 
                 //handling AI movement
-                enemyBar.moveAI(ball, enemyBar);
+                enemyBar.moveAI(ball, enemyBar, dt);
                 enemyBar.handleCollision(view);
 
                 //handling user input
-                userBar.update();
+                userBar.update(dt);
                 userBar.handleCollision(view);
 
                 //handling the window output

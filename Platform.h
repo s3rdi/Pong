@@ -5,7 +5,7 @@
 
 namespace ConfigP {
 	//speed of bars
-	static constexpr float moveSpeed{ 0.1f };
+	static constexpr float moveSpeed{ 500.0f };
 
 	//x-axis distance of AI's bar responding to the ball
 	static constexpr float AIresponse{ 500.0f };
@@ -21,8 +21,8 @@ public:
 	~Platform() = default;
 
 	void draw(sf::RenderWindow& window);
-	void update();
-	void moveAI(Ball& ball, Platform& enemyBar);
+	void update(float dt);
+	void moveAI(Ball& ball, Platform& enemyBar, float dt);
 	void handleCollision(sf::View& view);
 	void reset(float positionX, float positionY);
 	auto getBounaries() { return m_body.getGlobalBounds(); };

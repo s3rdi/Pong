@@ -16,25 +16,25 @@ void Platform::draw(sf::RenderWindow& window)
 }
 
 //moving player's bar
-void Platform::update()
+void Platform::update(float dt)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		m_body.move(0.0f, -ConfigP::moveSpeed);
+		m_body.move(0.0f, -ConfigP::moveSpeed * dt);
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-		m_body.move(0.0f, ConfigP::moveSpeed);
+		m_body.move(0.0f, ConfigP::moveSpeed * dt);
 	}
 }
 
 //handling AI
-void Platform::moveAI(Ball& ball, Platform& enemyBar)
+void Platform::moveAI(Ball& ball, Platform& enemyBar, float dt)
 {
 	if (abs(m_body.getPosition().x - ball.getBallPosition().x) < ConfigP::AIresponse) {
 		if (m_body.getPosition().y < ball.getBallPosition().y) {
-			m_body.move(0.0f, ConfigP::moveSpeed);
+			m_body.move(0.0f, ConfigP::moveSpeed * dt);
 		}
 		else if (m_body.getPosition().y > ball.getBallPosition().y) {
-			m_body.move(0.0f, -ConfigP::moveSpeed);
+			m_body.move(0.0f, -ConfigP::moveSpeed * dt);
 		}
 	}
 }
