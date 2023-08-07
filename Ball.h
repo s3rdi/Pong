@@ -1,7 +1,6 @@
 #ifndef BALL_H
 #define BALL_H
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
 #include "Platform.h"
 
 namespace ConfigB {
@@ -25,8 +24,8 @@ public:
 
 	void draw(sf::RenderWindow& window);
 	void update(float dt);
-	void screenCollision(sf::View& view, int& userLives, int& enemyLives, bool& waitForInput, sf::Sound& winSound, sf::Sound& loseSound, sf::Sound& sound);
-	void collidingBar(Platform& userBar, Platform& enemyBar, sf::Sound& sound);
+	int screenCollision(sf::View& view, int& userLives, int& enemyLives, bool& waitForInput);
+	bool collidingBar(Platform& userBar, Platform& enemyBar);
 	void reset();
 	sf::Vector2f getBallPosition() { return m_body.getPosition(); };
 

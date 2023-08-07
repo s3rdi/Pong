@@ -9,7 +9,7 @@
 #include "Platform.h"
 
 namespace Config {
-    //user's view size
+    //user's window size
     static constexpr float viewWidth{ 1280.0f };
     static constexpr float viewHeight{ 720.0f };
 
@@ -17,21 +17,23 @@ namespace Config {
     static constexpr int maxLives{ 3 };
 
     //ball config
+    //ball radius
     static constexpr float ballRadius{ 10.0f };
 
     //bar config
+    //bar size and starting position
     static const sf::Vector2f barSize{ 20.0f, 200.0f };
     static constexpr float barPosition{ 450.0f };
 
     //text config
+    //text size, score position, win and lose frazes
     static constexpr int textSize{ 50 };
-    static constexpr float textMargin{ 10.0f };
-    static constexpr float textAxisX{ 50.0f };
+    static constexpr float scorePosition{ 50.0f };
     static constexpr std::string_view winResult{ "You win!\n" };
     static constexpr std::string_view loseResult{ "You lose!\n" };
 }
 
-//scaling the game to user resized UI
+//scaling the game to resized UI
 void resizeView(const sf::RenderWindow& window, sf::View& view) {
     float aspectRatio{ static_cast<float>(window.getSize().x) / static_cast<float>(window.getSize().y) };
     view.setSize(sf::Vector2f(Config::viewHeight * aspectRatio, Config::viewHeight));
@@ -46,7 +48,7 @@ int main()
     //handling icon loading
     sf::Image icon{};
     if (!icon.loadFromFile("./icon.png")) {
-        std::cout << "Failed to load the icon!\n";
+        std::cout << "TXT-ERR: Failed to load the icon!\n";
         return EXIT_FAILURE;
     }
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -54,98 +56,107 @@ int main()
     //handling font loading
     sf::Font font{};
     if (!font.loadFromFile("./fonts/PublicPixel-z84yD.ttf")) {
-        std::cout << "Failed to load the font!\n";
+        std::cout << "FNT-ERR: Failed to load the font!\n";
         return EXIT_FAILURE;
     }
 
-    //creating objects
+    //creating objects for the game
+    Menu menu(Config::viewWidth, Config::viewHeight, font);
+    //bars on the opposite sides of the window
     Platform userBar(gConfig::propsColor, Config::barSize, sf::Vector2f(-Config::barPosition, 0.0f));
     Platform enemyBar(gConfig::propsColor, Config::barSize, sf::Vector2f(Config::barPosition, 0.0f));
     Ball ball(gConfig::propsColor, Config::ballRadius);
-    Menu menu(Config::viewWidth, Config::viewHeight, font);
     int userLives{ Config::maxLives };
     int enemyLives{ Config::maxLives };
 
+
     //creating text
+    //user score
     sf::Text t_userLives{std::to_string(Config::maxLives), font, Config::textSize};
     t_userLives.setFillColor(gConfig::propsColor);
     t_userLives.setOrigin(t_userLives.getGlobalBounds().getSize().x, 0.0f);
-    t_userLives.setPosition(-Config::textAxisX, -Config::viewHeight / 2.0f + Config::textMargin);
+    t_userLives.setPosition(-Config::scorePosition, -Config::viewHeight / 2.0f + 10.0f); //top margin 10
 
+    //enemy score
     sf::Text t_enemyLives{std::to_string(Config::maxLives), font, Config::textSize};
     t_enemyLives.setFillColor(gConfig::propsColor);
-    t_enemyLives.setPosition(Config::textAxisX, -Config::viewHeight / 2.0f + Config::textMargin);
+    t_enemyLives.setPosition(Config::scorePosition, -Config::viewHeight / 2.0f + 10.0f); //top margin 10
     
+    //game result fraze
     sf::Text t_gameResult{"", font, Config::textSize};
     t_gameResult.setFillColor(gConfig::propsColor);
 
-    //creating sounds
+    //play again prompt
+    //lowering textSize by 20
+    sf::Text playAgain{ "Move to continue!\n", font, Config::textSize-20};
+    playAgain.setFillColor(gConfig::propsColor);
+    //positioning text 200px under the ball
+    playAgain.setPosition(-playAgain.getGlobalBounds().getSize().x / 2.0f, 200.0f);
 
+    //esc to quit prompt
+    //lowering textSize by 20
+    sf::Text t_escToQuit{ "Esc to quit!\n", font, Config::textSize - 20};
+    t_escToQuit.setFillColor(gConfig::propsColor);
+    //positioning text 50px under playAgain
+    t_escToQuit.setPosition(-t_escToQuit.getGlobalBounds().getSize().x / 2.0f, 250.0f);
+
+
+    //creating all sounds
     //game won sound
-    sf::SoundBuffer s_soundBufferWinGame{};
-    if (!s_soundBufferWinGame.loadFromFile("./sounds/won_game.wav")) {
-        std::cout << "Failed to load the winning sound!\n";
+    sf::SoundBuffer s_sbWinGame{};
+    if (!s_sbWinGame.loadFromFile("./sounds/won_game.wav")) {
+        std::cout << "SND-ERR: Failed to load won_game.wav!\n";
         return EXIT_FAILURE;
     }
     sf::Sound s_winGame{};
-    s_winGame.setBuffer(s_soundBufferWinGame);
+    s_winGame.setBuffer(s_sbWinGame);
 
     //game lost sound
-    sf::SoundBuffer s_soundBufferLoseGame{};
-    if (!s_soundBufferLoseGame.loadFromFile("./sounds/lost_game.wav")) {
-        std::cout << "Failed to load the losing sound!\n";
+    sf::SoundBuffer s_sbLoseGame{};
+    if (!s_sbLoseGame.loadFromFile("./sounds/lost_game.wav")) {
+        std::cout << "SND-ERR: Failed to load lost_game.wav!\n";
         return EXIT_FAILURE;
     }
     sf::Sound s_loseGame{};
-    s_loseGame.setBuffer(s_soundBufferLoseGame);
+    s_loseGame.setBuffer(s_sbLoseGame);
 
     //ball hit sound
-    sf::SoundBuffer s_soundBufferBallHit{};
-    if (!s_soundBufferBallHit.loadFromFile("./sounds/ball_hit.wav")) {
-        std::cout << "Failed to load the hitting sound!\n";
+    sf::SoundBuffer s_sbBallHit{};
+    if (!s_sbBallHit.loadFromFile("./sounds/ball_hit.wav")) {
+        std::cout << "SND-ERR: Failed to load ball_hit.wav!\n";
         return EXIT_FAILURE;
     }
     sf::Sound s_ballHit{};
-    s_ballHit.setBuffer(s_soundBufferBallHit);
+    s_ballHit.setBuffer(s_sbBallHit);
 
     //score sound
-    sf::SoundBuffer s_soundBufferScore{};
-    if (!s_soundBufferScore.loadFromFile("./sounds/won_point.wav")) {
-        std::cout << "Failed to load the scoring a point sound!\n";
+    sf::SoundBuffer s_sbScore{};
+    if (!s_sbScore.loadFromFile("./sounds/won_point.wav")) {
+        std::cout << "SND-ERR: Failed to load won_point.wav!\n";
         return EXIT_FAILURE;
     }
     sf::Sound s_scoredPoint{};
-    s_scoredPoint.setBuffer(s_soundBufferScore);
+    s_scoredPoint.setBuffer(s_sbScore);
 
     //point lost sound
-    sf::SoundBuffer s_soundBufferAIScore{};
-    if (!s_soundBufferAIScore.loadFromFile("./sounds/lost_point.wav")) {
-        std::cout << "Failed to load the losing a point sound!\n";
+    sf::SoundBuffer s_sbAIScore{};
+    if (!s_sbAIScore.loadFromFile("./sounds/lost_point.wav")) {
+        std::cout << "SND-ERR: Failed to load lost_point.wav!\n";
         return EXIT_FAILURE;
     }
     sf::Sound s_lostPoint{};
-    s_lostPoint.setBuffer(s_soundBufferAIScore);
+    s_lostPoint.setBuffer(s_sbAIScore);
 
 
-
-    //smaller font (-20)
-    sf::Text playAgain{ "Move to continue!\n", font, Config::textSize-20};
-    playAgain.setFillColor(gConfig::propsColor);
-    //set lower (200.0f) for better look
-    playAgain.setPosition(-playAgain.getGlobalBounds().getSize().x / 2.0f, 200.0f);
-
-    //smaller font (-20)
-    sf::Text t_escToQuit{ "Esc to quit!\n", font, Config::textSize - 20};
-    t_escToQuit.setFillColor(gConfig::propsColor);
-    //set lower (250.0f) for better look
-    t_escToQuit.setPosition(-t_escToQuit.getGlobalBounds().getSize().x / 2.0f, 250.0f);
-
-    //checking whether player wants to play
+    //whether player wants to play
     bool isPlaying{ false };
+
+    //did the player start new game
     bool isNewGame{ false };
 
     //did the round/game reset
     bool waitForInput{ true };
+
 
     //clock for dt
     sf::Clock deltaClock{};
@@ -173,19 +184,22 @@ int main()
                 case sf::Keyboard::Up:
                 case sf::Keyboard::W:
                     menu.moveUp();
+                    //whether in menu either paused or not playing
                     if (waitForInput)
                         s_ballHit.play();
                     break;
                 case sf::Keyboard::Down:
                 case sf::Keyboard::S:
+                    menu.moveDown();
+                    //whether in menu either paused or not playing
                     if (waitForInput)
                         s_ballHit.play();
-                    menu.moveDown();
                     break;
                 case sf::Keyboard::Return:
                 case sf::Keyboard::Space:
                     switch (menu.getSelectedIndex()) {
                     case 0:
+                        //play
                         s_scoredPoint.play();
                         isNewGame = true;
                         isPlaying = true;
@@ -194,6 +208,7 @@ int main()
                         //options
                         break;
                     case 2:
+                        //quit
                         window.close();
                         break;
                     }
@@ -203,8 +218,10 @@ int main()
             }
         }
 
+        //if player is in the game
         if (isPlaying) {
             if (waitForInput) {
+                //move to continue prompt, skip if it's new game
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
                     sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || isNewGame) {
                     //handling instant new game
@@ -220,25 +237,42 @@ int main()
             }
             else {
                 isNewGame = false;
+
                 //handling ball movement
-                ball.collidingBar(userBar, enemyBar, s_ballHit);
-                ball.screenCollision(view, userLives, enemyLives, waitForInput, s_scoredPoint, s_lostPoint, s_ballHit);
+                if (ball.collidingBar(userBar, enemyBar)) {
+                    s_ballHit.play();
+                }
+                switch (ball.screenCollision(view, userLives, enemyLives, waitForInput)) {
+                case 2:
+                    s_ballHit.play();
+                    break;
+                case -1:
+                    s_lostPoint.play();
+                    break;
+                case 1:
+                    s_scoredPoint.play();
+                    break;
+                case 0:
+                    break;
+                }
                 ball.update(dt);
 
                 //handling points
                 t_userLives.setString(std::to_string(userLives));
                 t_enemyLives.setString(std::to_string(enemyLives));
 
-                //handling win and lose conditions
+                //handling win-lose conditions
                 if (userLives == 0) {
                     t_gameResult.setString(static_cast<std::string>(Config::loseResult));
                     //set higher (-100.0) for better look
                     t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
+                    s_loseGame.play();
                 }
                 else if (enemyLives == 0) {
                     t_gameResult.setString(static_cast<std::string>(Config::winResult));
                     //set higher (-100.0) for better look
                     t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
+                    s_winGame.play();
                 }
 
                 //handling AI movement
@@ -259,23 +293,17 @@ int main()
                 enemyBar.draw(window);
                 ball.draw(window);
 
-                //win-lose and play again conditions
+                //drawing when game is over
                 if (waitForInput) {
                     window.draw(playAgain);
-                    if (userLives == 0) {
-                        s_loseGame.play();
-                        window.draw(t_escToQuit);
-                    }
-                    else if (enemyLives == 0) {
-                        s_winGame.play();
-                        window.draw(t_escToQuit);
-                    }
+                    window.draw(t_escToQuit);
                 }
 
                 window.display();
             }
         }
 
+        //if not playing display the menu
         if (!isPlaying) {
             window.clear(gConfig::bgColor);
             window.setView(view);
