@@ -15,13 +15,33 @@ void Platform::draw(sf::RenderWindow& window)
 }
 
 //moving player's bar
-void Platform::update(float dt)
+void Platform::update(float dt, bool isTwoPlayers, bool isPlayerTwo)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		m_body.move(0.0f, -pConfig::moveSpeed * dt);
+	if (isTwoPlayers) {
+		if (isPlayerTwo) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+				m_body.move(0.0f, -pConfig::moveSpeed * dt);
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+				m_body.move(0.0f, pConfig::moveSpeed * dt);
+			}
+		}
+		else {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+				m_body.move(0.0f, -pConfig::moveSpeed * dt);
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+				m_body.move(0.0f, pConfig::moveSpeed * dt);
+			}
+		}
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-		m_body.move(0.0f, pConfig::moveSpeed * dt);
+	else {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+			m_body.move(0.0f, -pConfig::moveSpeed * dt);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+			m_body.move(0.0f, pConfig::moveSpeed * dt);
+		}
 	}
 }
 

@@ -22,7 +22,7 @@ public:
 	~Platform() = default;
 
 	void draw(sf::RenderWindow& window);
-	void update(float dt);
+	void update(float dt, bool isTwoPlayers, bool isPlayerTwo);
 	void moveAI(Ball& ball, Platform& enemyBar, float dt);
 	void handleCollision(sf::View& view);
 	void reset(float positionX, float positionY);

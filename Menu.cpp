@@ -4,12 +4,12 @@ Menu::Menu(float width, float height, sf::Font& font)
 {
 	m_menu[0].setFont(font);
 	m_menu[0].setFillColor(mConfig::selectedColor);
-	m_menu[0].setString("Play!");
+	m_menu[0].setString("1 player!");
 	m_menu[0].setPosition(sf::Vector2f(-m_menu[0].getGlobalBounds().getSize().x / 2.0f, -(height / 2.0f) + height / (mConfig::maxMenuItems + 1) * 1));
 
 	m_menu[1].setFont(font);
 	m_menu[1].setFillColor(gConfig::propsColor);
-	m_menu[1].setString("Options");
+	m_menu[1].setString("2 players!");
 	m_menu[1].setPosition(sf::Vector2f(-m_menu[1].getGlobalBounds().getSize().x / 2.0f, -(height / 2.0f) + height / (mConfig::maxMenuItems + 1) * 2));
 
 	m_menu[2].setFont(font);

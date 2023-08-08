@@ -75,6 +75,6 @@ void Ball::randStart()
 	auto tempX = (dRandomizer(mt) == 1) ?  -1 : 1;
 	auto tempY = (dRandomizer(mt) == 1) ? -1 : 1;
 
-	m_speed.x = 500 * tempX;
-	m_speed.y = 300 * tempY;
+	m_speed.x = 500.0f * tempX;
+	m_speed.y = 300.0f * tempY;
 }

@@ -31,6 +31,9 @@ namespace Config {
     static constexpr float scorePosition{ 50.0f };
     static constexpr std::string_view winResult{ "You win!\n" };
     static constexpr std::string_view loseResult{ "You lose!\n" };
+    //two players frazes
+    static constexpr std::string_view win1Result{ "Player 1 wins!\n" };
+    static constexpr std::string_view win2Result{ "Player 2 wins!\n" };
 }
 
 //scaling the game to resized UI
@@ -157,6 +160,8 @@ int main()
     //did the round/game reset
     bool waitForInput{ true };
 
+    //is it 2 players mode
+    bool isTwoPlayers{ false };
 
     //clock for dt
     sf::Clock deltaClock{};
@@ -180,6 +185,7 @@ int main()
                 switch (evnt.key.code) {
                 case sf::Keyboard::Escape:
                     isPlaying = false;
+                    isTwoPlayers = false;
                     break;
                 case sf::Keyboard::Up:
                 case sf::Keyboard::W:
@@ -205,7 +211,10 @@ int main()
                         isPlaying = true;
                         break;
                     case 1:
-                        //options
+                        //2 players mode
+                        isTwoPlayers = true;
+                        isNewGame = true;
+                        isPlaying = true;
                         break;
                     case 2:
                         //quit
@@ -268,24 +277,43 @@ int main()
 
                 //handling win-lose conditions
                 if (userLives == 0) {
-                    t_gameResult.setString(static_cast<std::string>(Config::loseResult));
-                    //set higher (-100.0) for better look
-                    t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
-                    s_loseGame.play();
+                    if (isTwoPlayers) {
+                        t_gameResult.setString(static_cast<std::string>(Config::win2Result));
+                        t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
+                        s_winGame.play();
+                    }
+                    else {
+                        t_gameResult.setString(static_cast<std::string>(Config::loseResult));
+                        //set higher (-100.0) for better look
+                        t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
+                        s_loseGame.play();
+                    }
                 }
                 else if (enemyLives == 0) {
-                    t_gameResult.setString(static_cast<std::string>(Config::winResult));
-                    //set higher (-100.0) for better look
-                    t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
-                    s_winGame.play();
+                    if (isTwoPlayers) {
+                        t_gameResult.setString(static_cast<std::string>(Config::win1Result));
+                        t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
+                        s_winGame.play();
+                    }
+                    else {
+                        t_gameResult.setString(static_cast<std::string>(Config::winResult));
+                        //set higher (-100.0) for better look
+                        t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
+                        s_winGame.play();
+                    }
                 }
 
                 //handling AI movement
-                enemyBar.moveAI(ball, enemyBar, dt);
+                if (isTwoPlayers) {
+                    enemyBar.update(dt, isTwoPlayers, true);
+                }
+                else {
+                    enemyBar.moveAI(ball, enemyBar, dt);
+                }
                 enemyBar.handleCollision(view);
 
                 //handling user input
-                userBar.update(dt);
+                userBar.update(dt, isTwoPlayers, false);
                 userBar.handleCollision(view);
 
                 //handling the window output
