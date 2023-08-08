@@ -232,6 +232,7 @@ int main()
                         enemyBar.reset(Config::barPosition, 0.0f);
                         t_gameResult.setString("");
                     }
+                    ball.randStart();
                     waitForInput = false;
                 }
             }

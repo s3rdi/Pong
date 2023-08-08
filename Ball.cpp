@@ -1,3 +1,4 @@
+#include <random>
 #include "Ball.h"
 
 Ball::Ball(float radius)
@@ -7,7 +8,6 @@ Ball::Ball(float radius)
 	m_body.setRadius(radius);
 	m_body.setPosition(0.0f, 0.0f);
 }
-
 
 //drawing the ball
 void Ball::draw(sf::RenderWindow& window)
@@ -29,8 +29,6 @@ void Ball::reset()
 {
 	m_velocity.x = 0.0f;
 	m_velocity.y = 0.0f;
-	m_speed.x = bConfig::startSpeedX;
-	m_speed.y = bConfig::startSpeedY;
 }
 
 //checking screen collison
@@ -67,4 +65,16 @@ bool Ball::collidingBar(Platform& userBar, Platform& enemyBar) {
 		return true;
 	}
 	return false;
+}
+
+//randomize first ball move
+void Ball::randStart()
+{
+	std::mt19937 mt{ static_cast<std::mt19937::result_type>(std::time(nullptr)) };
+	std::uniform_int_distribution dRandomizer{ 1, 2 };
+	auto tempX = (dRandomizer(mt) == 1) ?  -1 : 1;
+	auto tempY = (dRandomizer(mt) == 1) ? -1 : 1;
+
+	m_speed.x = 500 * tempX;
+	m_speed.y = 300 * tempY;
 }
