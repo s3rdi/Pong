@@ -9,7 +9,7 @@ namespace pConfig {
 	static constexpr float moveSpeed{ 700.0f };
 
 	//x-axis distance of AI's bar responding to the ball
-	static constexpr float AIresponse{ 700.0f };
+	static constexpr float AIresponse{ 500.0f };
 }
 
 //forward declaring ball for moveAI function
