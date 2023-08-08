@@ -1,10 +1,10 @@
 #include <random>
 #include "Ball.h"
 
-Ball::Ball(float radius)
+Ball::Ball(float radius, sf::Color& color)
 {
 	m_body.setOrigin(radius, radius);
-	m_body.setFillColor(gConfig::propsColor);
+	m_body.setFillColor(color);
 	m_body.setRadius(radius);
 	m_body.setPosition(0.0f, 0.0f);
 }

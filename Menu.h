@@ -1,8 +1,11 @@
 #ifndef MENU_H
 #define MENU_H
 #include <array>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include <SFML/Graphics.hpp>
-#include "Config.h"
 
 namespace mConfig {
 	//number of items in menu
@@ -15,12 +18,18 @@ namespace mConfig {
 class Menu
 {
 public:
+
 	Menu(float width, float height, sf::Font& font);
 	~Menu() = default;
+
+	//config variables
+	sf::Color m_propsColor{};
+	sf::Color m_bgColor{};
 
 	void draw(sf::RenderWindow& window);
 	void moveUp();
 	void moveDown();
+	void initConfig();
 	int getSelectedIndex() { return m_selectedItem; };
 
 private:

@@ -2,7 +2,6 @@
 #define PLATFORM_H
 #include <SFML/Graphics.hpp>
 #include "Ball.h"
-#include "Config.h"
 
 namespace pConfig {
 	//speed of bars
@@ -18,7 +17,7 @@ class Ball;
 class Platform
 {
 public:
-	Platform(sf::Vector2f size, sf::Vector2f position);
+	Platform(sf::Vector2f size, sf::Vector2f position, sf::Color& color);
 	~Platform() = default;
 
 	void draw(sf::RenderWindow& window);

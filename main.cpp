@@ -4,7 +4,6 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include "Ball.h"
-#include "Config.h"
 #include "Menu.h"
 #include "Platform.h"
 
@@ -65,41 +64,41 @@ int main()
 
     //creating objects for the game
     Menu menu(Config::viewWidth, Config::viewHeight, font);
+    //menu.initConfig();
     //bars on the opposite sides of the window
-    Platform userBar(Config::barSize, sf::Vector2f(-Config::barPosition, 0.0f));
-    Platform enemyBar(Config::barSize, sf::Vector2f(Config::barPosition, 0.0f));
-    Ball ball(Config::ballRadius);
+    Platform userBar(Config::barSize, sf::Vector2f(-Config::barPosition, 0.0f), menu.m_propsColor);
+    Platform enemyBar(Config::barSize, sf::Vector2f(Config::barPosition, 0.0f), menu.m_propsColor);
+    Ball ball(Config::ballRadius, menu.m_propsColor);
     int userLives{ Config::maxLives };
     int enemyLives{ Config::maxLives };
-
 
     //creating text
     //user score
     sf::Text t_userLives{std::to_string(Config::maxLives), font, Config::textSize};
-    t_userLives.setFillColor(gConfig::propsColor);
+    t_userLives.setFillColor(menu.m_propsColor);
     t_userLives.setOrigin(t_userLives.getGlobalBounds().getSize().x, 0.0f);
     t_userLives.setPosition(-Config::scorePosition, -Config::viewHeight / 2.0f + 10.0f); //top margin 10
 
     //enemy score
     sf::Text t_enemyLives{std::to_string(Config::maxLives), font, Config::textSize};
-    t_enemyLives.setFillColor(gConfig::propsColor);
+    t_enemyLives.setFillColor(menu.m_propsColor);
     t_enemyLives.setPosition(Config::scorePosition, -Config::viewHeight / 2.0f + 10.0f); //top margin 10
     
     //game result fraze
     sf::Text t_gameResult{"", font, Config::textSize};
-    t_gameResult.setFillColor(gConfig::propsColor);
+    t_gameResult.setFillColor(menu.m_propsColor);
 
     //play again prompt
     //lowering textSize by 20
     sf::Text playAgain{ "Move to continue!\n", font, Config::textSize-20};
-    playAgain.setFillColor(gConfig::propsColor);
+    playAgain.setFillColor(menu.m_propsColor);
     //positioning text 200px under the ball
     playAgain.setPosition(-playAgain.getGlobalBounds().getSize().x / 2.0f, 200.0f);
 
     //esc to quit prompt
     //lowering textSize by 20
     sf::Text t_escToQuit{ "Esc to quit!\n", font, Config::textSize - 20};
-    t_escToQuit.setFillColor(gConfig::propsColor);
+    t_escToQuit.setFillColor(menu.m_propsColor);
     //positioning text 50px under playAgain
     t_escToQuit.setPosition(-t_escToQuit.getGlobalBounds().getSize().x / 2.0f, 250.0f);
 
@@ -257,7 +256,10 @@ int main()
                     s_ballHit.play();
                     break;
                 case -1:
-                    s_lostPoint.play();
+                    if (isTwoPlayers)
+                        s_scoredPoint.play();
+                    else 
+                        s_lostPoint.play();
                     --userLives;
                     waitForInput = true;
                     break;
@@ -317,7 +319,7 @@ int main()
                 userBar.handleCollision(view);
 
                 //handling the window output
-                window.clear(gConfig::bgColor);
+                window.clear(menu.m_bgColor);
                 window.setView(view);
                 window.draw(t_userLives);
                 window.draw(t_enemyLives);
@@ -338,7 +340,7 @@ int main()
 
         //if not playing display the menu
         if (!isPlaying) {
-            window.clear(gConfig::bgColor);
+            window.clear(menu.m_bgColor);
             window.setView(view);
             menu.draw(window);
             window.display();

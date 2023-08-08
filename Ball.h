@@ -1,7 +1,7 @@
 #ifndef BALL_H
 #define BALL_H
 #include <SFML/Graphics.hpp>
-#include "Config.h"
+#include "Menu.h"
 #include "Platform.h"
 
 namespace bConfig {
@@ -18,7 +18,7 @@ class Platform;
 class Ball
 {
 public:
-	Ball(float radius);
+	Ball(float radius, sf::Color& color);
 	~Ball() = default;
 
 	void draw(sf::RenderWindow& window);

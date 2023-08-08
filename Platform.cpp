@@ -1,8 +1,8 @@
 #include "Platform.h"
 
-Platform::Platform(sf::Vector2f size, sf::Vector2f position)
+Platform::Platform(sf::Vector2f size, sf::Vector2f position, sf::Color& color)
 {
-	m_body.setFillColor(gConfig::propsColor);
+	m_body.setFillColor(color);
 	m_body.setSize(size);
 	m_body.setOrigin(size / 2.0f);
 	m_body.setPosition(position);
