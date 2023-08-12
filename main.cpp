@@ -6,22 +6,21 @@
 #include "Ball.h"
 #include "Menu.h"
 #include "Platform.h"
+#include "Config.h"
 
 namespace Config {
     //user's window size
     static constexpr float viewWidth{ 1280.0f };
     static constexpr float viewHeight{ 720.0f };
 
-    //max lives for both players
-    static constexpr int maxLives{ 3 };
+    //max points for both players
+    static constexpr int maxPoints{ 5 };
 
-    //ball config
     //ball radius
     static constexpr float ballRadius{ 8.0f };
 
-    //bar config
     //bar size and starting position
-    static const sf::Vector2f barSize{ 10.0f, 100.0f };
+    static constexpr float barHalfSize{ 10.0f };
     static constexpr float barPosition{ 600.0f };
 
     //text config
@@ -43,6 +42,9 @@ void resizeView(const sf::RenderWindow& window, sf::View& view) {
 
 int main()
 {
+    //initialize config
+    initConfig();
+
     //creating window and view
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(Config::viewWidth), static_cast<unsigned int>(Config::viewHeight)), "Pong", sf::Style::Default);
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(Config::viewWidth, Config::viewHeight));
@@ -64,41 +66,40 @@ int main()
 
     //creating objects for the game
     Menu menu(Config::viewWidth, Config::viewHeight, font);
-    //menu.initConfig();
     //bars on the opposite sides of the window
-    Platform userBar(Config::barSize, sf::Vector2f(-Config::barPosition, 0.0f), menu.m_propsColor);
-    Platform enemyBar(Config::barSize, sf::Vector2f(Config::barPosition, 0.0f), menu.m_propsColor);
-    Ball ball(Config::ballRadius, menu.m_propsColor);
-    int userLives{ Config::maxLives };
-    int enemyLives{ Config::maxLives };
+    Platform userBar(-Config::barHalfSize, -Config::barPosition);
+    Platform enemyBar(Config::barHalfSize, Config::barPosition);
+    Ball ball(Config::ballRadius);
+    int userPoints{ 0 };
+    int enemyPoints{ 0 };
 
     //creating text
     //user score
-    sf::Text t_userLives{std::to_string(Config::maxLives), font, Config::textSize};
-    t_userLives.setFillColor(menu.m_propsColor);
+    sf::Text t_userLives{std::to_string(0), font, Config::textSize};
+    t_userLives.setFillColor(gConfig::propsColor);
     t_userLives.setOrigin(t_userLives.getGlobalBounds().getSize().x, 0.0f);
     t_userLives.setPosition(-Config::scorePosition, -Config::viewHeight / 2.0f + 10.0f); //top margin 10
 
     //enemy score
-    sf::Text t_enemyLives{std::to_string(Config::maxLives), font, Config::textSize};
-    t_enemyLives.setFillColor(menu.m_propsColor);
+    sf::Text t_enemyLives{std::to_string(0), font, Config::textSize};
+    t_enemyLives.setFillColor(gConfig::propsColor);
     t_enemyLives.setPosition(Config::scorePosition, -Config::viewHeight / 2.0f + 10.0f); //top margin 10
     
     //game result fraze
     sf::Text t_gameResult{"", font, Config::textSize};
-    t_gameResult.setFillColor(menu.m_propsColor);
+    t_gameResult.setFillColor(gConfig::propsColor);
 
     //play again prompt
     //lowering textSize by 20
-    sf::Text playAgain{ "Move to continue!\n", font, Config::textSize-20};
-    playAgain.setFillColor(menu.m_propsColor);
+    sf::Text playAgain{ "Enter to continue!\n", font, Config::textSize-20};
+    playAgain.setFillColor(gConfig::propsColor);
     //positioning text 200px under the ball
     playAgain.setPosition(-playAgain.getGlobalBounds().getSize().x / 2.0f, 200.0f);
 
     //esc to quit prompt
     //lowering textSize by 20
     sf::Text t_escToQuit{ "Esc to quit!\n", font, Config::textSize - 20};
-    t_escToQuit.setFillColor(menu.m_propsColor);
+    t_escToQuit.setFillColor(gConfig::propsColor);
     //positioning text 50px under playAgain
     t_escToQuit.setPosition(-t_escToQuit.getGlobalBounds().getSize().x / 2.0f, 250.0f);
 
@@ -188,39 +189,43 @@ int main()
                     break;
                 case sf::Keyboard::Up:
                 case sf::Keyboard::W:
-                    menu.moveUp();
                     //whether in menu either paused or not playing
-                    if (waitForInput)
+                    if (!isPlaying) {
+                        menu.moveUp();
                         s_ballHit.play();
+                    }
                     break;
                 case sf::Keyboard::Down:
                 case sf::Keyboard::S:
-                    menu.moveDown();
                     //whether in menu either paused or not playing
-                    if (waitForInput)
+                    if (!isPlaying) {
+                        menu.moveDown();
                         s_ballHit.play();
+                    }
                     break;
                 case sf::Keyboard::Return:
                 case sf::Keyboard::Space:
-                    switch (menu.getSelectedIndex()) {
-                    case 0:
-                        //play
-                        s_scoredPoint.play();
-                        isNewGame = true;
-                        isPlaying = true;
-                        break;
-                    case 1:
-                        //2 players mode
-                        isTwoPlayers = true;
-                        isNewGame = true;
-                        isPlaying = true;
-                        break;
-                    case 2:
-                        //quit
-                        window.close();
+                    if (!isPlaying) {
+                        switch (menu.getSelectedIndex()) {
+                        case 0:
+                            //play
+                            s_scoredPoint.play();
+                            isNewGame = true;
+                            isPlaying = true;
+                            break;
+                        case 1:
+                            //2 players mode
+                            isTwoPlayers = true;
+                            isNewGame = true;
+                            isPlaying = true;
+                            break;
+                        case 2:
+                            //quit
+                            window.close();
+                            break;
+                        }
                         break;
                     }
-                    break;
                 }
                 break;
             }
@@ -230,17 +235,16 @@ int main()
         if (isPlaying) {
             if (waitForInput) {
                 //move to continue prompt, skip if it's new game
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
-                    sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || isNewGame) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || isNewGame) {
+                    userBar.reset(-Config::barPosition, 0.0f);
+                    enemyBar.reset(Config::barPosition, 0.0f);
+                    ball.randStart();
                     //handling instant new game
-                    if (userLives == 0 || enemyLives == 0) {
-                        userLives = Config::maxLives;
-                        enemyLives = Config::maxLives;
-                        userBar.reset(-Config::barPosition, 0.0f);
-                        enemyBar.reset(Config::barPosition, 0.0f);
+                    if (userPoints == Config::maxPoints || enemyPoints == Config::maxPoints) {
+                        userPoints = 0;
+                        enemyPoints = 0;
                         t_gameResult.setString("");
                     }
-                    ball.randStart();
                     waitForInput = false;
                 }
             }
@@ -248,7 +252,7 @@ int main()
                 isNewGame = false;
 
                 //handling ball movement
-                if (ball.collidingBar(userBar, enemyBar)) {
+                if (ball.collidingBar(userBar, enemyBar, dt)) {
                     s_ballHit.play();
                 }
                 switch (ball.screenCollision(view)) {
@@ -260,12 +264,12 @@ int main()
                         s_scoredPoint.play();
                     else 
                         s_lostPoint.play();
-                    --userLives;
+                    ++enemyPoints;
                     waitForInput = true;
                     break;
                 case 1:
                     s_scoredPoint.play();
-                    --enemyLives;
+                    ++userPoints;
                     waitForInput = true;
                     break;
                 case 0:
@@ -274,11 +278,11 @@ int main()
                 ball.update(dt);
 
                 //handling points
-                t_userLives.setString(std::to_string(userLives));
-                t_enemyLives.setString(std::to_string(enemyLives));
+                t_userLives.setString(std::to_string(userPoints));
+                t_enemyLives.setString(std::to_string(enemyPoints));
 
                 //handling win-lose conditions
-                if (userLives == 0) {
+                if (enemyPoints == Config::maxPoints) {
                     if (isTwoPlayers) {
                         t_gameResult.setString(static_cast<std::string>(Config::win2Result));
                         t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
@@ -291,7 +295,7 @@ int main()
                         s_loseGame.play();
                     }
                 }
-                else if (enemyLives == 0) {
+                else if (userPoints == Config::maxPoints) {
                     if (isTwoPlayers) {
                         t_gameResult.setString(static_cast<std::string>(Config::win1Result));
                         t_gameResult.setPosition(-t_gameResult.getGlobalBounds().getSize().x / 2.0f, -100.0f);
@@ -310,7 +314,7 @@ int main()
                     enemyBar.update(dt, isTwoPlayers, true);
                 }
                 else {
-                    enemyBar.moveAI(ball, enemyBar, dt);
+                    enemyBar.moveAI(ball, dt);
                 }
                 enemyBar.handleCollision(view);
 
@@ -319,7 +323,7 @@ int main()
                 userBar.handleCollision(view);
 
                 //handling the window output
-                window.clear(menu.m_bgColor);
+                window.clear(gConfig::bgColor);
                 window.setView(view);
                 window.draw(t_userLives);
                 window.draw(t_enemyLives);
@@ -337,10 +341,9 @@ int main()
                 window.display();
             }
         }
-
         //if not playing display the menu
         if (!isPlaying) {
-            window.clear(menu.m_bgColor);
+            window.clear(gConfig::bgColor);
             window.setView(view);
             menu.draw(window);
             window.display();

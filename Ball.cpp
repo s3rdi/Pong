@@ -1,10 +1,10 @@
 #include <random>
 #include "Ball.h"
 
-Ball::Ball(float radius, sf::Color& color)
+Ball::Ball(float radius)
 {
 	m_body.setOrigin(radius, radius);
-	m_body.setFillColor(color);
+	m_body.setFillColor(gConfig::propsColor);
 	m_body.setRadius(radius);
 	m_body.setPosition(0.0f, 0.0f);
 }
@@ -34,8 +34,8 @@ void Ball::reset()
 //checking screen collison
 int Ball::screenCollision(sf::View& view)
 {
-	if ((m_body.getPosition().y - m_body.getRadius()) < -view.getSize().y / 2.0f || 
-		(m_body.getPosition().y + m_body.getRadius()) > view.getSize().y / 2.0f) {
+	if ((m_body.getPosition().y - m_body.getRadius()) <= -view.getSize().y / 2.0f || 
+		(m_body.getPosition().y + m_body.getRadius()) >= view.getSize().y / 2.0f) {
 		//inverting y-axis speed
 		m_speed.y *= -1.0f;
 		return 2;
@@ -54,14 +54,17 @@ int Ball::screenCollision(sf::View& view)
 	return 0;
 }
 
-//checking bar collision
-bool Ball::collidingBar(Platform& userBar, Platform& enemyBar) {
-	//pixel of the ball colliding with user bar ||
-	//pixel of the ball colliding with enemy bar
-	if (userBar.getBounaries().intersects(m_body.getGlobalBounds()) ||
-		enemyBar.getBounaries().intersects(m_body.getGlobalBounds())) {
+//check bar collision
+bool Ball::collidingBar(Platform& userBar, Platform& enemyBar, float dt) {
+	sf::FloatRect ballBounds { m_body.getGlobalBounds() };
+	sf::FloatRect nextPos { ballBounds };
+
+	nextPos.left += m_speed.x * dt;
+	nextPos.top += m_speed.y * dt;
+
+	if (userBar.getBounaries().intersects(nextPos) || enemyBar.getBounaries().intersects(nextPos)) {
 		m_speed.x *= -bConfig::incSpeed;
-		m_speed.y += bConfig::bouncingAngle;
+		m_speed.y *= bConfig::bouncingAngle;
 		return true;
 	}
 	return false;
@@ -75,6 +78,6 @@ void Ball::randStart()
 	auto tempX = (dRandomizer(mt) == 1) ?  -1 : 1;
 	auto tempY = (dRandomizer(mt) == 1) ? -1 : 1;
 
-	m_speed.x = 500.0f * tempX;
-	m_speed.y = 300.0f * tempY;
+	m_speed.x = 350.0f * tempX;
+	m_speed.y = 220.0f * tempY;
 }

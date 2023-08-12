@@ -1,11 +1,15 @@
 #include "Platform.h"
 
-Platform::Platform(sf::Vector2f size, sf::Vector2f position, sf::Color& color)
+Platform::Platform(float size, float position)
 {
-	m_body.setFillColor(color);
-	m_body.setSize(size);
-	m_body.setOrigin(size / 2.0f);
-	m_body.setPosition(position);
+	m_body.setPointCount(4);
+	m_body.setPoint(0, sf::Vector2f(pConfig::width / 2.0f - size, 0.0f));
+	m_body.setPoint(1, sf::Vector2f(pConfig::width / 2.0f + size, pConfig::height * 1.0f/3.0f));
+	m_body.setPoint(2, sf::Vector2f(pConfig::width / 2.0f + size, pConfig::height * 2.0f/3.0f));
+	m_body.setPoint(3, sf::Vector2f(pConfig::width / 2.0f - size, pConfig::height));
+	m_body.setOrigin(pConfig::width / 2.0f, pConfig::height / 2.0f);
+	m_body.setPosition(position, 0.0f);
+	m_body.setFillColor(gConfig::propsColor);
 }
 
 //drawing the platform
@@ -46,7 +50,7 @@ void Platform::update(float dt, bool isTwoPlayers, bool isPlayerTwo)
 }
 
 //handling AI
-void Platform::moveAI(Ball& ball, Platform& enemyBar, float dt)
+void Platform::moveAI(Ball& ball, float dt)
 {
 	if (m_body.getPosition().x - ball.getBallPosition().x < pConfig::AIresponse) {
 		if (m_body.getPosition().y < ball.getBallPosition().y) {
@@ -61,7 +65,7 @@ void Platform::moveAI(Ball& ball, Platform& enemyBar, float dt)
 //handle screen collision
 void Platform::handleCollision(sf::View& view)
 {
-	float halfPlatform{ m_body.getSize().y / 2.0f };
+	float halfPlatform{ 60 };
 	if (m_body.getPosition().y - halfPlatform < -view.getSize().y / 2.0f) {
 		m_body.setPosition(m_body.getPosition().x, -view.getSize().y / 2.0f + halfPlatform);
 	}
