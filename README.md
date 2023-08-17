@@ -10,7 +10,7 @@
      <li>first game ever created.</li>
  </ul>
 
-<p>There is a config file to change colors of the game.
-In singleplayer player moves with W/S or Up/Down keys.
-In 2-players mode left player uses W/S, while right uses Up/Down.
+<p>There is a config file to change colors of the game.<br>
+In singleplayer player moves with W/S or Up/Down keys.<br>
+In 2-players mode left player uses W/S, while right uses Up/Down.<br>
 Player can also pause the game with Esc.</p>
