@@ -9,7 +9,7 @@ Simple Pong clone written in C++ using SFML 2.6.
 
 ### Demo
 
-![Aquarium Demo](./demo.gif)
+![Pong Demo](./demo.gif)
 
 ---
 
